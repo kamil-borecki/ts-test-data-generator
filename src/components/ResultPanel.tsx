@@ -25,14 +25,17 @@ export default function ResultPanel({
 }: ResultPanelProps) {
   return (
     <Paper withBorder radius="lg" p="lg" className="panel surface-card">
-      <Group justify="space-between" align="center" wrap="nowrap" mb="md">
+      <Group justify="space-between" align="flex-end" wrap="nowrap" mb="md">
         <Title order={2} size="h3">
           Results
         </Title>
 
         <Group gap="sm" wrap="nowrap" className="result-toolbar">
+          <Text size="xs" fw={500}>
+            Count
+          </Text>
           <NumberInput
-            label="Count"
+            aria-label="Number of records"
             size="xs"
             value={recordCount}
             min={1}

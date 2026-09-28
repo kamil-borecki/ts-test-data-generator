@@ -25,12 +25,12 @@ The development server is available at the URL printed by Vite (normally `http:/
 
 ## Scripts
 
-| Command | Description |
-| --- | --- |
-| `npm run dev` | Start the Vite development server. |
-| `npm run build` | Type-check and create a production build in `dist/`. |
-| `npm run lint` | Run Oxlint. |
-| `npm run preview` | Preview the production build locally. |
+| Command           | Description                                          |
+| ----------------- | ---------------------------------------------------- |
+| `npm run dev`     | Start the Vite development server.                   |
+| `npm run build`   | Type-check and create a production build in `dist/`. |
+| `npm run lint`    | Run Oxlint.                                          |
+| `npm run preview` | Preview the production build locally.                |
 
 ## Deployment
 
