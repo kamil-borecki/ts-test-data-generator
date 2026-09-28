@@ -14,7 +14,7 @@ A browser-based generator for test data from a TypeScript type definition or a m
 
 ## Local development
 
-Requirements: Node.js 20 or newer.
+Requirements: Node.js 26.10.0 or newer. If you use nvm, run `nvm use` in the project directory.
 
 ```bash
 npm install
