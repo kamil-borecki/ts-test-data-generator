@@ -21,6 +21,29 @@ const createField = (overrides: Partial<Field> = {}): Field => ({
   ...overrides,
 })
 
+const extractInlineEnumValues = (typeExpression: string): string[] | null => {
+  const withoutArray = typeExpression.replace(/\[\]$/, '').trim()
+  const unionParts = withoutArray
+    .split('|')
+    .map((part) => part.trim())
+    .filter(Boolean)
+
+  if (unionParts.length < 2) return null
+
+  const values = unionParts.map((part) => {
+    const literal = part.replace(/^['"]|['"]$/g, '').trim()
+    return literal
+  })
+
+  const isLiteralUnion = unionParts.every((part) => /^['"].+['"]$/.test(part.trim()))
+
+  if (!isLiteralUnion || values.some((value) => !value)) {
+    return null
+  }
+
+  return values
+}
+
 const parsePropertyList = (
   body: string,
   customTypes: Record<string, Field[]>,
@@ -64,6 +87,17 @@ const parsePropertyList = (
         ...overrides,
       })
 
+    const literalEnumValues = extractInlineEnumValues(typeExpression)
+    if (literalEnumValues) {
+      parsed.push(
+        buildField('enum', {
+          enumName: name,
+          enumValues: literalEnumValues,
+        }),
+      )
+      continue
+    }
+
     const lowerType = baseType.toLowerCase()
 
     if (customEnums[baseType]) {
@@ -81,6 +115,7 @@ const parsePropertyList = (
         parsed.push(
           buildField('array', {
             arrayItemType: 'object',
+            objectType: baseType,
             children: customTypes[baseType],
             min: 2,
             max: 5,
@@ -142,7 +177,13 @@ const parsePropertyList = (
     }
 
     if (lowerType === 'date') {
-      parsed.push(buildField('date', { dateVariant: 'iso' }))
+      parsed.push(
+        buildField('string', {
+          stringVariant: 'date',
+          stringFormat: 'yyyy-MM-dd',
+          dateFormat: 'yyyy-MM-dd',
+        }),
+      )
       continue
     }
 
@@ -152,7 +193,7 @@ const parsePropertyList = (
   return parsed
 }
 
-export const parseTypeText = (input: string): Field[] | null => {
+export const parseTypeText = (input: string, targetName?: string): Field[] | null => {
   if (!input.trim()) return null
 
   const sanitized = input
@@ -174,23 +215,68 @@ export const parseTypeText = (input: string): Field[] | null => {
     customEnums[enumName] = values
   }
 
-  for (const match of sanitized.matchAll(/interface\s+([A-Za-z0-9_$]+)\s*\{([\s\S]*?)\}/g)) {
+  for (const match of sanitized.matchAll(/(?:type|interface)\s+([A-Za-z0-9_$]+)\s*(?:=\s*)?\{([\s\S]*?)\}/g)) {
     const [, typeName, body] = match
     customTypes[typeName] = parsePropertyList(body, customTypes, customEnums)
   }
 
-  const objectMatch = sanitized.match(/(?:type|interface)\s+[A-Za-z0-9_$]+\s*(?:=\s*)?\{([\s\S]*)\}\s*;?$/)
-  if (objectMatch) {
-    const fields = parsePropertyList(objectMatch[1], customTypes, customEnums)
+  const allDecls = [...sanitized.matchAll(/(?:type|interface)\s+([A-Za-z0-9_$]+)\s*(?:=\s*)?\{([\s\S]*?)\}/g)]
+  const selectedDeclaration = targetName
+    ? allDecls.find(([, name]) => name === targetName)
+    : allDecls.at(-1)
+
+  if (selectedDeclaration) {
+    const [, rootName, body] = selectedDeclaration
+    customTypes[rootName] = parsePropertyList(body, customTypes, customEnums)
+    const fields = customTypes[rootName] ?? []
     return fields.length > 0 ? fields : null
   }
 
-  const lastInterface = [...sanitized.matchAll(/interface\s+([A-Za-z0-9_$]+)\s*\{([\s\S]*?)\}/g)].at(-1)
-  if (lastInterface) {
-    const [, rootName] = lastInterface
+  const lastDecl = allDecls.at(-1)
+  if (lastDecl) {
+    const [, rootName, body] = lastDecl
+    customTypes[rootName] = parsePropertyList(body, customTypes, customEnums)
     const fields = customTypes[rootName] ?? []
     return fields.length > 0 ? fields : null
   }
 
   return null
+}
+
+// Extract declarations (interfaces and enums) and return fields for a specific interface
+export const getDeclarationFields = (input: string, declarationName: string): Field[] => {
+  if (!input.trim()) return []
+
+  const sanitized = input
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/export\s+/g, '')
+    .trim()
+
+  const customEnums: Record<string, string[]> = {}
+  const customTypes: Record<string, Field[]> = {}
+
+  for (const match of sanitized.matchAll(/enum\s+([A-Za-z0-9_$]+)\s*\{([\s\S]*?)\}/g)) {
+    const [, enumName, rawValues] = match
+    const values = rawValues
+      .split(',')
+      .map((value) => value.trim())
+      .map((value) => value.replace(/^['"]|['"]$/g, ''))
+      .filter(Boolean)
+
+    customEnums[enumName] = values
+  }
+
+  for (const match of sanitized.matchAll(/(?:type|interface)\s+([A-Za-z0-9_$]+)\s*(?:=\s*)?\{([\s\S]*?)\}/g)) {
+    const [, typeName, body] = match
+    customTypes[typeName] = parsePropertyList(body, customTypes, customEnums)
+  }
+
+  return customTypes[declarationName] ?? []
+}
+
+export const getDeclarationNamesInOrder = (input: string): string[] => {
+  if (!input.trim()) return []
+  return [...input.matchAll(/(?:type|interface)\s+([A-Za-z0-9_$]+)\s*(?:=\s*)?\{/g)]
+    .map((m) => m[1])
+    .filter(Boolean)
 }
