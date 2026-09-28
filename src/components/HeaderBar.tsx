@@ -6,9 +6,9 @@ type HeaderBarProps = {
 
 export default function HeaderBar({ onGenerate }: HeaderBarProps) {
   return (
-    <Group justify="space-between" align="flex-end" mb="lg" className="topbar-group">
+    <Group justify="space-between" align="flex-end" mb="lg" w="100%">
       <Stack gap={4}>
-        <Text fw={700} c="violet.3" tt="uppercase" size="xs" className="eyebrow">
+        <Text fw={700} c="violet.3" tt="uppercase" size="xs" style={{ letterSpacing: '0.12em' }}>
           Test data starter
         </Text>
         <Title order={1}>TypeScript data generator</Title>

@@ -4,63 +4,6 @@
   padding: 32px 20px 48px;
 }
 
-.eyebrow {
-  letter-spacing: 0.12em;
-}
-
-.surface-card {
-  background: rgba(15, 23, 42, 0.72);
-  border-color: rgba(148, 163, 184, 0.2);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-}
-
-.field-card {
-  background: rgba(15, 23, 42, 0.42);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  border-radius: 16px;
-  padding: 16px;
-  margin-bottom: 16px;
-}
-
-.json-output,
-.type-box {
-  max-height: 420px;
-  overflow: auto;
-  font-size: 12px;
-  line-height: 1.6;
-}
-
-.topbar-group,
-.paste-actions {
-  align-items: center !important;
-}
-
-.result-toolbar {
-  margin-left: auto;
-  justify-content: flex-end;
-  align-items: flex-end !important;
-}
-
-.mantine-Group-root,
-.mantine-Grid-root {
-  width: 100%;
-}
-
-.mantine-Input-wrapper,
-.mantine-TextInput-root,
-.mantine-NumberInput-root,
-.mantine-Select-root,
-.mantine-Textarea-root {
-  width: 100%;
-}
-
-.mantine-Input-input,
-.mantine-Textarea-input,
-.mantine-Select-input,
-.mantine-NumberInput-input {
-  width: 100%;
-}
-
 .ts-editor-shell {
   position: relative;
   min-height: 260px;

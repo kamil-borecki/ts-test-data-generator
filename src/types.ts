@@ -1,6 +1,6 @@
-export type DataType = 'number' | 'string' | 'boolean' | 'date'
+export type DataType = 'number' | 'string' | 'boolean' | 'date' | 'enum' | 'array' | 'object'
 export type NumberVariant = 'int' | 'float' | 'unixEpoch'
-export type StringVariant = 'name' | 'email' | 'uuid' | 'word' | 'sentence' | 'phone' | 'url'
+export type StringVariant = 'name' | 'email' | 'uuid' | 'word' | 'sentence' | 'phone' | 'url' | 'date'
 export type BooleanVariant = 'boolean'
 export type DateVariant = 'iso' | 'unixEpoch'
 
@@ -12,9 +12,20 @@ export type Field = {
   stringVariant?: StringVariant
   booleanVariant?: BooleanVariant
   dateVariant?: DateVariant
+  stringFormat?: string
+  dateFormat?: string
+  enumValues?: string[]
+  enumName?: string
+  arrayItemType?: DataType
+  objectType?: string
+  nullable?: boolean
+  optional?: boolean
+  children?: Field[]
   min?: number
   max?: number
   decimals?: number
+  autoIncrement?: boolean
+  autoIncrementStep?: number
 }
 
 export const numberVariants: { value: NumberVariant; label: string }[] = [
@@ -31,7 +42,10 @@ export const stringVariants: { value: StringVariant; label: string }[] = [
   { value: 'sentence', label: 'Sentence' },
   { value: 'phone', label: 'Phone' },
   { value: 'url', label: 'URL' },
+  { value: 'date', label: 'Date' },
 ]
+
+export const customStringFormatLabel = 'Custom format'
 
 export const dateVariants: { value: DateVariant; label: string }[] = [
   { value: 'iso', label: 'ISO date' },
