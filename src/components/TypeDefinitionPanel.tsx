@@ -20,7 +20,7 @@ const escapeHtml = (value: string) =>
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
 
-const syntaxTokenPattern = /\/\/[^\n]*|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`|\b(?:type|interface|export)\b|\b(?:string|number|boolean|Date|unknown|any|null|undefined)\b|[{}();:]/g
+const syntaxTokenPattern = /\/\/[^\n]*|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`|\b(?:type|interface|enum|export)\b|\b(?:string|number|boolean|Date|unknown|any|null|undefined)\b|[{}();:]/g
 
 const highlightTsCode = (value: string) =>
   escapeHtml(value).replace(syntaxTokenPattern, (token) => {

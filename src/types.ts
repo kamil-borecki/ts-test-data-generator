@@ -1,4 +1,4 @@
-export type DataType = 'number' | 'string' | 'boolean' | 'date'
+export type DataType = 'number' | 'string' | 'boolean' | 'date' | 'enum' | 'array' | 'object'
 export type NumberVariant = 'int' | 'float' | 'unixEpoch'
 export type StringVariant = 'name' | 'email' | 'uuid' | 'word' | 'sentence' | 'phone' | 'url'
 export type BooleanVariant = 'boolean'
@@ -12,6 +12,13 @@ export type Field = {
   stringVariant?: StringVariant
   booleanVariant?: BooleanVariant
   dateVariant?: DateVariant
+  enumValues?: string[]
+  enumName?: string
+  arrayItemType?: DataType
+  objectType?: string
+  nullable?: boolean
+  optional?: boolean
+  children?: Field[]
   min?: number
   max?: number
   decimals?: number

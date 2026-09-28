@@ -48,6 +48,9 @@ export default function FieldEditorCard({
               { value: 'string', label: 'string' },
               { value: 'boolean', label: 'boolean' },
               { value: 'date', label: 'date' },
+              { value: 'enum', label: 'enum' },
+              { value: 'array', label: 'array' },
+              { value: 'object', label: 'object' },
             ]}
             value={field.type}
             onChange={(value) =>
@@ -57,6 +60,10 @@ export default function FieldEditorCard({
                 stringVariant: value === 'string' ? 'name' : field.stringVariant,
                 booleanVariant: value === 'boolean' ? 'boolean' : field.booleanVariant,
                 dateVariant: value === 'date' ? 'iso' : field.dateVariant,
+                enumValues: value === 'enum' ? ['new', 'paid', 'shipped'] : field.enumValues,
+                arrayItemType: value === 'array' ? 'string' : field.arrayItemType,
+                objectType: value === 'object' ? 'CustomType' : field.objectType,
+                children: value === 'object' || value === 'array' ? field.children ?? [] : [],
               })
             }
           />
@@ -152,6 +159,76 @@ export default function FieldEditorCard({
               onChange={(value) =>
                 onFieldChange(field.id, { dateVariant: (value ?? 'iso') as DateVariant })
               }
+            />
+          </Grid.Col>
+        </Grid>
+      )}
+
+      {field.type === 'enum' && (
+        <Grid mt="sm">
+          <Grid.Col span={12}>
+            <TextInput
+              label="Enum values"
+              size="xs"
+              value={field.enumValues?.join(', ') ?? ''}
+              placeholder="new, paid, shipped"
+              onChange={(event) =>
+                onFieldChange(field.id, {
+                  enumValues: event.currentTarget.value
+                    .split(',')
+                    .map((item) => item.trim())
+                    .filter(Boolean),
+                })
+              }
+            />
+          </Grid.Col>
+        </Grid>
+      )}
+
+      {field.type === 'array' && (
+        <Grid mt="sm">
+          <Grid.Col span={{ base: 12, sm: 6 }}>
+            <Select
+              label="Item type"
+              size="xs"
+              data={[
+                { value: 'string', label: 'string' },
+                { value: 'number', label: 'number' },
+                { value: 'boolean', label: 'boolean' },
+                { value: 'date', label: 'date' },
+                { value: 'enum', label: 'enum' },
+                { value: 'object', label: 'object' },
+              ]}
+              value={field.arrayItemType ?? 'string'}
+              onChange={(value) =>
+                onFieldChange(field.id, {
+                  arrayItemType: (value ?? 'string') as DataType,
+                })
+              }
+            />
+          </Grid.Col>
+
+          <Grid.Col span={{ base: 12, sm: 6 }}>
+            <NumberInput
+              label="Length"
+              size="xs"
+              min={1}
+              max={10}
+              value={field.min ?? 2}
+              onChange={(value) => onFieldChange(field.id, { min: Number(value) || 2, max: Number(value) || 2 })}
+            />
+          </Grid.Col>
+        </Grid>
+      )}
+
+      {field.type === 'object' && (
+        <Grid mt="sm">
+          <Grid.Col span={12}>
+            <TextInput
+              label="Object type"
+              size="xs"
+              value={field.objectType ?? 'CustomType'}
+              onChange={(event) => onFieldChange(field.id, { objectType: event.currentTarget.value || 'CustomType' })}
             />
           </Grid.Col>
         </Grid>

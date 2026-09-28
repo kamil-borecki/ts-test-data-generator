@@ -71,22 +71,32 @@ function App() {
   const [typeText, setTypeText] = useState(defaultTypeText)
   const [parseError, setParseError] = useState('')
 
+  const getFieldTypeLabel = (field: Field): string => {
+    switch (field.type) {
+      case 'number':
+        return 'number'
+      case 'string':
+        return 'string'
+      case 'boolean':
+        return 'boolean'
+      case 'date':
+        return 'Date'
+      case 'enum':
+        return field.enumName ?? 'string'
+      case 'array':
+        return `${field.arrayItemType === 'object' ? (field.objectType ?? 'Record<string, unknown>') : getFieldTypeLabel({ ...field, type: field.arrayItemType ?? 'string' })}[]`
+      case 'object':
+        return field.objectType ?? 'Record<string, unknown>'
+      default:
+        return 'string'
+    }
+  }
+
   const schemaPreview = useMemo(
     () =>
       `type Example = {\n${fields
         .filter((field) => field.name.trim())
-        .map((field) => {
-          const fieldType =
-            field.type === 'number'
-              ? 'number'
-              : field.type === 'string'
-                ? 'string'
-                : field.type === 'boolean'
-                  ? 'boolean'
-                  : 'string'
-
-          return `  ${field.name}: ${fieldType};`
-        })
+        .map((field) => `  ${field.name}${field.optional ? '?' : ''}: ${getFieldTypeLabel(field)};`)
         .join('\n')}\n}`,
     [fields],
   )
